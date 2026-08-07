@@ -1,5 +1,5 @@
 window.ATHEER_CONFIG = {
-  "supabaseUrl": "https://mglevsvzwdzuscahsjbh.supabase.co",
-  "supabaseAnonKey": "sb_publishable_IQQXZsFmpWtJlza7rxq5FQ_2N-nUwLE",
+  "supabaseUrl": "https://shzqmfckvzzvftgffnld.supabase.co",
+  "supabaseAnonKey": "sb_publishable_bTXm6p0b99qUhKdTOS4bOw_vBKZOkg--",
   "storageBucket": "atheer-media"
 };
