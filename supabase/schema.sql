@@ -153,7 +153,15 @@ insert into public.settings (setting_key, value, label)
 values
   ('whatsapp_number', '212661852411', 'رقم واتساب بصيغة دولية'),
   ('bundle_price', '199', 'سعر الباقة بالدرهم'),
-  ('delivery_text', 'توصيل مجاني على جميع الطلبات', 'نص التوصيل')
+  ('delivery_text', 'توصيل مجاني على جميع الطلبات', 'نص التوصيل'),
+  ('theme_bg', '#0c0a08', 'الخلفية'),
+  ('theme_surface', '#211912', 'أسطح البطاقات'),
+  ('theme_text', '#f3ecdf', 'النص الرئيسي'),
+  ('theme_muted', '#b9ab96', 'النص الثانوي'),
+  ('theme_accent', '#b79353', 'اللون الأساسي'),
+  ('theme_accent_light', '#e0c17f', 'اللون الفاتح'),
+  ('theme_jade', '#5d7c67', 'اللون المساند'),
+  ('theme_radius', '0px', 'استدارة الحواف')
 on conflict (setting_key) do nothing;
 
 insert into public.site_assets

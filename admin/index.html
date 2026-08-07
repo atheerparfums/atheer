@@ -26,7 +26,6 @@
         <div class="brand-mark"><span>أثير</span><small>ATHEER · CONTROL</small></div>
         <p class="eyebrow">مساحة خاصة</p>
         <h1>لوحة التحكم</h1>
-        <p class="auth-copy">أدر المنتجات والصور والمحتوى من مكان واحد، مع بقاء الموقع العام كما هو.</p>
         <form id="login-form">
           <label>البريد الإلكتروني<input id="login-email" type="email" autocomplete="email" required placeholder="admin@atheer.ma" /></label>
           <label>كلمة المرور<input id="login-password" type="password" autocomplete="current-password" required placeholder="••••••••" /></label>
@@ -80,6 +79,11 @@
           <label>ترتيب الظهور<input id="product-order" type="number" min="0" value="0" /></label>
         </div>
         <label>صورة المنتج<select id="product-image"><option value="">الصورة الافتراضية</option></select></label>
+        <div class="image-upload-editor">
+          <label>تحميل صورة جديدة من الهاتف أو الحاسوب<input id="product-image-file" type="file" accept="image/png,image/jpeg,image/webp" capture="environment" /></label>
+          <div id="product-image-preview" class="editor-image-preview" hidden></div>
+        </div>
+        <label>وصف الصورة<input id="product-image-alt" placeholder="وصف قصير للصورة" /></label>
         <label class="check-label"><input id="product-featured" type="checkbox" checked /> يظهر في المنتجات المميزة</label>
         <div class="dialog-actions"><button class="secondary-button" value="cancel" type="submit">إلغاء</button><button class="primary-button" id="product-save" value="default" type="submit">حفظ المنتج</button></div>
       </form>
@@ -93,6 +97,18 @@
         <label>القيمة<textarea id="content-value" required rows="6"></textarea></label>
         <label class="check-label"><input id="content-hidden" type="checkbox" /> إخفاء هذا المحتوى من الموقع</label>
         <div class="dialog-actions"><button class="secondary-button" value="cancel" type="submit">إلغاء</button><button class="primary-button" value="default" type="submit">حفظ المحتوى</button></div>
+      </form>
+    </dialog>
+
+    <dialog id="asset-dialog" class="editor-dialog">
+      <form id="asset-form" method="dialog">
+        <div class="dialog-head"><div><p class="eyebrow">MEDIA</p><h2>تعديل الصورة</h2></div><button class="icon-button" value="cancel" type="submit">×</button></div>
+        <input id="asset-id" type="hidden" />
+        <div id="asset-dialog-preview" class="editor-image-preview asset-dialog-preview"></div>
+        <label>اسم الصورة<input id="asset-key" readonly /></label>
+        <label>النص البديل والوصف<input id="asset-alt" placeholder="وصف قصير للصورة" /></label>
+        <label>مكان الاستخدام<select id="asset-placement"><option value="product">منتج</option><option value="hero">الواجهة الرئيسية</option><option value="offer">العرض</option><option value="gallery">المعرض</option><option value="other">آخر</option></select></label>
+        <div class="dialog-actions"><button class="secondary-button" value="cancel" type="submit">إلغاء</button><button class="primary-button" value="default" type="submit">حفظ الصورة</button></div>
       </form>
     </dialog>
 
