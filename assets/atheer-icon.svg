@@ -1,0 +1,83 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="512" height="512">
+  <defs>
+    <radialGradient id="bg" cx="50%" cy="38%" r="62%">
+      <stop offset="0%" stop-color="#1a1410"/>
+      <stop offset="100%" stop-color="#0c0a08"/>
+    </radialGradient>
+    <radialGradient id="glow" cx="50%" cy="50%" r="50%">
+      <stop offset="0%" stop-color="#d4aa6a" stop-opacity="0.18"/>
+      <stop offset="100%" stop-color="#d4aa6a" stop-opacity="0"/>
+    </radialGradient>
+    <linearGradient id="gold" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#e8c97a"/>
+      <stop offset="45%" stop-color="#b79353"/>
+      <stop offset="100%" stop-color="#8a6830"/>
+    </linearGradient>
+    <linearGradient id="goldLight" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#f0d890"/>
+      <stop offset="100%" stop-color="#c4a060"/>
+    </linearGradient>
+  </defs>
+
+  <!-- Background -->
+  <rect width="512" height="512" rx="96" fill="url(#bg)"/>
+
+  <!-- Subtle glow -->
+  <ellipse cx="256" cy="210" rx="180" ry="160" fill="url(#glow)"/>
+
+  <!-- Outer frame — thin gold rectangle -->
+  <rect x="36" y="36" width="440" height="440" rx="64" fill="none" stroke="url(#gold)" stroke-width="1.5" opacity="0.55"/>
+
+  <!-- Inner frame — very thin -->
+  <rect x="52" y="52" width="408" height="408" rx="52" fill="none" stroke="url(#gold)" stroke-width="0.75" opacity="0.3"/>
+
+  <!-- Decorative horizontal lines — top -->
+  <line x1="100" y1="148" x2="196" y2="148" stroke="url(#gold)" stroke-width="0.8" opacity="0.5"/>
+  <line x1="316" y1="148" x2="412" y2="148" stroke="url(#gold)" stroke-width="0.8" opacity="0.5"/>
+
+  <!-- Small diamond ornament — top center -->
+  <polygon points="256,132 263,148 256,164 249,148" fill="url(#gold)" opacity="0.7"/>
+
+  <!-- Perfume bottle silhouette — main mark -->
+  <!-- Neck -->
+  <rect x="232" y="175" width="48" height="14" rx="4" fill="url(#gold)" opacity="0.9"/>
+  <!-- Cap -->
+  <rect x="242" y="162" width="28" height="16" rx="3" fill="url(#goldLight)"/>
+  <!-- Collar -->
+  <rect x="228" y="187" width="56" height="8" rx="2" fill="url(#gold)"/>
+  <!-- Body -->
+  <path d="M210 195 Q206 220 204 255 Q202 300 210 330 Q220 355 256 358 Q292 355 302 330 Q310 300 308 255 Q306 220 302 195 Z"
+        fill="url(#gold)" opacity="0.92"/>
+  <!-- Body shine -->
+  <path d="M222 205 Q219 235 218 265 Q217 295 222 318 Q226 295 227 265 Q228 235 226 208 Z"
+        fill="#f5e4b0" opacity="0.18"/>
+  <!-- Label area on bottle -->
+  <rect x="222" y="248" width="68" height="60" rx="3" fill="#0c0a08" opacity="0.3"/>
+  <!-- Label text lines -->
+  <line x1="234" y1="264" x2="278" y2="264" stroke="#f5e4b0" stroke-width="1.2" opacity="0.55"/>
+  <line x1="240" y1="275" x2="272" y2="275" stroke="#f5e4b0" stroke-width="0.8" opacity="0.38"/>
+  <line x1="244" y1="284" x2="268" y2="284" stroke="#f5e4b0" stroke-width="0.8" opacity="0.28"/>
+
+  <!-- Decorative horizontal lines — bottom -->
+  <line x1="100" y1="376" x2="196" y2="376" stroke="url(#gold)" stroke-width="0.8" opacity="0.5"/>
+  <line x1="316" y1="376" x2="412" y2="376" stroke="url(#gold)" stroke-width="0.8" opacity="0.5"/>
+
+  <!-- Small diamond ornament — bottom center -->
+  <polygon points="256,360 263,376 256,392 249,376" fill="url(#gold)" opacity="0.7"/>
+
+  <!-- Brand word "ATHEER" at bottom -->
+  <text x="256" y="438"
+        font-family="Georgia, 'Times New Roman', serif"
+        font-size="28"
+        font-weight="normal"
+        letter-spacing="9"
+        text-anchor="middle"
+        fill="url(#goldLight)"
+        opacity="0.85">ATHEER</text>
+
+  <!-- Tiny dots — corner accents -->
+  <circle cx="80" cy="80" r="2.5" fill="url(#gold)" opacity="0.4"/>
+  <circle cx="432" cy="80" r="2.5" fill="url(#gold)" opacity="0.4"/>
+  <circle cx="80" cy="432" r="2.5" fill="url(#gold)" opacity="0.4"/>
+  <circle cx="432" cy="432" r="2.5" fill="url(#gold)" opacity="0.4"/>
+</svg>
