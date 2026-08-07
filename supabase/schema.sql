@@ -267,6 +267,9 @@ insert into storage.buckets (id, name, public)
 values ('atheer-media', 'atheer-media', true)
 on conflict (id) do update set public = true;
 
+-- Keep the bucket name in one place for the admin and public site.
+-- The policies below are required for uploads made with the signed-in admin session.
+
 drop policy if exists "public can view atheer media" on storage.objects;
 create policy "public can view atheer media"
   on storage.objects for select
