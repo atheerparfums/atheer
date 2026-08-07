@@ -217,7 +217,11 @@
     if (asset?.public_url) return asset.public_url;
     const path = String(asset?.storage_path || "");
     if (!path) return "";
-    if (/^assets\//i.test(path)) return `../${path}`;
+    if (/^assets\//i.test(path)) {
+      // Auto-fix legacy seed paths: assets/*.webp → assets/webp/*.webp
+      const fixedPath = /^assets\/[^/]+\.webp$/i.test(path) ? path.replace("assets/", "assets/webp/") : path;
+      return `../${fixedPath}`;
+    }
     return client ? client.storage.from(storageBucket).getPublicUrl(path).data.publicUrl : "";
   }
 
