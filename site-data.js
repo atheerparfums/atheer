@@ -3,6 +3,7 @@
   const config = window.ATHEER_CONFIG || {};
   if (!config.supabaseUrl || !config.supabaseAnonKey) return;
   const endpoint = `${config.supabaseUrl.replace(/\/$/, "")}/rest/v1`;
+  const storageBucket = config.storageBucket || "atheer-media";
   const headers = { apikey: config.supabaseAnonKey, Authorization: `Bearer ${config.supabaseAnonKey}` };
   const assetSelectors = {
     hero: [".hero::before"], product: [".product-shot"], offer: [".offer-main-img"],
@@ -20,7 +21,11 @@
   }[character]));
 
   function url(asset) {
-    return asset?.public_url || (asset?.storage_path ? asset.storage_path : "");
+    if (asset?.public_url) return asset.public_url;
+    const path = String(asset?.storage_path || "");
+    if (!path) return "";
+    if (/^assets\//i.test(path)) return path;
+    return `${config.supabaseUrl.replace(/\/$/, "")}/storage/v1/object/public/${encodeURIComponent(storageBucket)}/${path.split("/").map(encodeURIComponent).join("/")}`;
   }
   function text(value) { return String(value ?? ""); }
   function fetchTable(table, query) {

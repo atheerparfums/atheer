@@ -5,6 +5,7 @@
   const client = config.supabaseUrl && config.supabaseAnonKey && window.supabase
     ? window.supabase.createClient(config.supabaseUrl, config.supabaseAnonKey)
     : null;
+  const storageBucket = config.storageBucket || "atheer-media";
   const state = {
     products: [],
     assets: [],
@@ -42,6 +43,21 @@
     element.classList.add("show");
     clearTimeout(toast.timer);
     toast.timer = setTimeout(() => element.classList.remove("show"), 3200);
+  }
+
+  function friendlyError(error, fallback = "تعذر إتمام العملية") {
+    const message = String(error?.message || error || "");
+    const lower = message.toLowerCase();
+    if (lower.includes("bucket") && (lower.includes("not found") || lower.includes("does not exist"))) return "مخزن الصور غير جاهز حالياً.";
+    if (lower.includes("row-level security") || lower.includes("not authorized") || lower.includes("permission")) return "ليست لديك صلاحية تنفيذ هذا التغيير.";
+    if (lower.includes("jwt") || lower.includes("session") || lower.includes("token")) return "انتهت جلسة الدخول. أعد تسجيل الدخول ثم حاول مرة أخرى.";
+    if (lower.includes("duplicate key") || lower.includes("already exists")) return "يوجد عنصر آخر بنفس الاسم أو الكود.";
+    return message || fallback;
+  }
+
+  function requireSession() {
+    if (!state.session?.user?.id) throw new Error("انتهت جلسة الدخول. أعد تسجيل الدخول.");
+    return state.session.user.id;
   }
 
   function setLoginError(message) {
@@ -111,7 +127,7 @@
       await loadData();
       renderView();
     } catch (error) {
-      setLoginError(error.message || "تعذر تسجيل الدخول. تحقق من البيانات.");
+      setLoginError(friendlyError(error, "تعذر تسجيل الدخول. تحقق من البيانات."));
     } finally {
       button.disabled = false;
     }
@@ -198,7 +214,11 @@
   }
 
   function assetUrl(asset) {
-    return asset?.public_url || (asset?.storage_path ? `../${asset.storage_path}` : "");
+    if (asset?.public_url) return asset.public_url;
+    const path = String(asset?.storage_path || "");
+    if (!path) return "";
+    if (/^assets\//i.test(path)) return `../${path}`;
+    return client ? client.storage.from(storageBucket).getPublicUrl(path).data.publicUrl : "";
   }
 
   function productRow(item) {
@@ -311,31 +331,33 @@
     let imageAssetKey = $("#product-image").value || null;
     const file = $("#product-image-file").files?.[0];
     let uploadedAsset = null;
-    if (file) {
-      try {
+    const saveButton = $("#product-save");
+    try {
+      if (saveButton) saveButton.disabled = true;
+      if (file) {
         uploadedAsset = await uploadImageFile(file, $("#product-image-alt").value.trim(), "product");
         imageAssetKey = uploadedAsset.asset_key;
-      } catch (error) {
-        return toast(error.message || "تعذر رفع الصورة");
       }
-    }
-    const payload = {
-      code: $("#product-code").value.trim(),
-      name: $("#product-name").value.trim(),
-      gender: $("#product-gender").value,
-      sort_order: Number($("#product-order").value || 0),
-      is_featured: $("#product-featured").checked,
-      image_asset_key: imageAssetKey,
-      updated_by: state.session.user.id
-    };
-    const id = $("#product-id").value;
-    const result = id ? await client.from("products").update(payload).eq("id", id) : await client.from("products").insert(payload);
-    if (result.error) {
+      const payload = {
+        code: $("#product-code").value.trim(),
+        name: $("#product-name").value.trim(),
+        gender: $("#product-gender").value,
+        sort_order: Number($("#product-order").value || 0),
+        is_featured: $("#product-featured").checked,
+        image_asset_key: imageAssetKey,
+        updated_by: requireSession()
+      };
+      const id = $("#product-id").value;
+      const result = id ? await client.from("products").update(payload).eq("id", id) : await client.from("products").insert(payload);
+      if (result.error) throw result.error;
+      $("#product-dialog").close();
+      await loadData(); renderProducts(); toast("تم حفظ المنتج");
+    } catch (error) {
       if (uploadedAsset) await removeAsset(uploadedAsset);
-      return toast(result.error.message);
+      toast(friendlyError(error, "تعذر حفظ المنتج"));
+    } finally {
+      if (saveButton) saveButton.disabled = false;
     }
-    $("#product-dialog").close();
-    await loadData(); renderProducts(); toast("تم حفظ المنتج");
   }
 
   async function productAction(action, id) {
@@ -346,7 +368,7 @@
     const result = action === "delete"
       ? await client.from("products").delete().eq("id", id)
       : await client.from("products").update({ is_hidden: !product.is_hidden, updated_by: state.session.user.id }).eq("id", id);
-    if (result.error) return toast(result.error.message);
+    if (result.error) return toast(friendlyError(result.error));
     await loadData(); renderProducts(); toast(action === "delete" ? "تم حذف المنتج" : "تم تحديث حالة المنتج");
   }
 
@@ -360,21 +382,25 @@
         $("#media-placement")?.value || "product"
       );
     } catch (error) {
-      return toast(error.message || "تعذر رفع الصورة");
+      event.target.value = "";
+      return toast(friendlyError(error, "تعذر رفع الصورة"));
     }
     event.target.value = "";
     await loadData(); renderMedia(); toast("تم رفع الصورة");
   }
 
   async function uploadImageFile(file, altText, placement) {
-    if (!file.type.startsWith("image/")) throw new Error("اختر ملف صورة صالحاً");
+    const extension = file.name.split(".").pop()?.toLowerCase() || "";
+    const acceptedExtensions = ["jpg", "jpeg", "png", "webp", "gif"];
+    if (!file.type.startsWith("image/") && !acceptedExtensions.includes(extension)) throw new Error("اختر ملف صورة صالحاً");
     if (file.size > 8 * 1024 * 1024) throw new Error("حجم الصورة أكبر من 8MB");
     const safeName = file.name.toLowerCase().replace(/[^a-z0-9._-]+/g, "-").replace(/^-+|-+$/g, "") || "image";
     const stamp = `${Date.now()}-${Math.random().toString(36).slice(2, 8)}`;
     const path = `uploads/${stamp}-${safeName}`;
-    const upload = await client.storage.from("atheer-media").upload(path, file, { upsert: false, contentType: file.type });
+    const contentType = file.type || `image/${extension === "jpg" ? "jpeg" : extension}`;
+    const upload = await client.storage.from(storageBucket).upload(path, file, { upsert: false, contentType, cacheControl: "3600" });
     if (upload.error) throw upload.error;
-    const { data: publicData } = client.storage.from("atheer-media").getPublicUrl(path);
+    const { data: publicData } = client.storage.from(storageBucket).getPublicUrl(path);
     const key = `upload-${stamp}`;
     const { data, error } = await client.from("site_assets").insert({
       asset_key: key,
@@ -386,7 +412,7 @@
       updated_by: state.session.user.id
     }).select("*").single();
     if (error) {
-      await client.storage.from("atheer-media").remove([path]);
+      await client.storage.from(storageBucket).remove([path]);
       throw error;
     }
     return data;
@@ -394,7 +420,7 @@
 
   async function removeAsset(asset) {
     await client.from("site_assets").delete().eq("id", asset.id);
-    if (asset.storage_path) await client.storage.from("atheer-media").remove([asset.storage_path]);
+    if (asset.storage_path && !/^assets\//i.test(asset.storage_path)) await client.storage.from(storageBucket).remove([asset.storage_path]);
   }
 
   async function assetAction(action, id) {
@@ -404,11 +430,11 @@
     if (action === "delete" && !window.confirm(`حذف الصورة «${asset.asset_key}» نهائياً؟`)) return;
     if (action === "delete") {
       const result = await client.from("site_assets").delete().eq("id", id);
-      if (result.error) return toast(result.error.message);
-      if (asset.storage_path) await client.storage.from("atheer-media").remove([asset.storage_path]);
+      if (result.error) return toast(friendlyError(result.error));
+      if (asset.storage_path && !/^assets\//i.test(asset.storage_path)) await client.storage.from(storageBucket).remove([asset.storage_path]);
     } else {
       const result = await client.from("site_assets").update({ is_hidden: !asset.is_hidden, updated_by: state.session.user.id }).eq("id", id);
-      if (result.error) return toast(result.error.message);
+      if (result.error) return toast(friendlyError(result.error));
     }
     await loadData(); renderMedia(); toast(action === "delete" ? "تم حذف الصورة" : "تم تحديث حالة الصورة");
   }
@@ -434,7 +460,7 @@
       placement: $("#asset-placement").value,
       updated_by: state.session.user.id
     }).eq("id", $("#asset-id").value);
-    if (result.error) return toast(result.error.message);
+    if (result.error) return toast(friendlyError(result.error));
     $("#asset-dialog").close();
     await loadData(); renderMedia(); toast("تم حفظ الصورة");
   }
@@ -457,7 +483,7 @@
     const result = action === "delete"
       ? await client.from("site_content").delete().eq("id", id)
       : await client.from("site_content").update({ is_hidden: !item.is_hidden, updated_by: state.session.user.id }).eq("id", id);
-    if (result.error) return toast(result.error.message);
+    if (result.error) return toast(friendlyError(result.error));
     await loadData(); renderContent(); toast(action === "delete" ? "تم حذف المحتوى" : "تم تحديث حالة المحتوى");
   }
 
@@ -470,7 +496,7 @@
       is_hidden: $("#content-hidden").checked,
       updated_by: state.session.user.id
     }).eq("id", $("#content-id").value);
-    if (result.error) return toast(result.error.message);
+    if (result.error) return toast(friendlyError(result.error));
     $("#content-dialog").close(); await loadData(); renderContent(); toast("تم حفظ المحتوى");
   }
 
@@ -482,7 +508,7 @@
         label: input.dataset.settingLabel || input.dataset.settingKey,
         updated_by: state.session.user.id
       });
-      if (result.error) return toast(result.error.message);
+      if (result.error) return toast(friendlyError(result.error, "تعذر حفظ الإعدادات"));
       const publicCopy = await client.from("site_content").upsert({
         content_key: `setting_${input.dataset.settingKey}`,
         value: input.value,
@@ -490,7 +516,7 @@
         is_hidden: false,
         updated_by: state.session.user.id
       }, { onConflict: "content_key" });
-      if (publicCopy.error) return toast(publicCopy.error.message);
+      if (publicCopy.error) return toast(friendlyError(publicCopy.error, "تعذر مزامنة الإعدادات"));
     }
     await loadData(); toast("تم حفظ الإعدادات");
   }
@@ -498,7 +524,7 @@
   async function deleteSetting(key) {
     if (!window.confirm("حذف هذا الإعداد نهائياً؟")) return;
     const result = await client.from("settings").delete().eq("setting_key", key);
-    if (result.error) return toast(result.error.message);
+    if (result.error) return toast(friendlyError(result.error));
     await loadData(); renderSettings(); toast("تم حذف الإعداد");
   }
 
@@ -513,6 +539,15 @@
     $("#product-image-file").addEventListener("change", event => {
       const file = event.target.files?.[0];
       if (!file) return;
+      const extension = file.name.split(".").pop()?.toLowerCase() || "";
+      if (!file.type.startsWith("image/") && !["jpg", "jpeg", "png", "webp", "gif"].includes(extension)) {
+        event.target.value = "";
+        return toast("اختر ملف صورة صالحاً");
+      }
+      if (file.size > 8 * 1024 * 1024) {
+        event.target.value = "";
+        return toast("حجم الصورة أكبر من 8MB");
+      }
       const preview = $("#product-image-preview");
       preview.hidden = false;
       preview.innerHTML = `<img src="${URL.createObjectURL(file)}" alt="" />`;
@@ -520,7 +555,6 @@
     $("#logout-btn").addEventListener("click", async () => { await client.auth.signOut(); showAuth(); });
     document.querySelectorAll(".nav-item[data-view]").forEach(item => item.addEventListener("click", () => navView(item.dataset.view)));
     $("#mobile-menu").addEventListener("click", () => $(".sidebar").classList.toggle("open"));
-    if ("serviceWorker" in navigator) navigator.serviceWorker.register("./sw.js").catch(() => {});
     if (!configured()) {
       setLoginError("تعذر الاتصال بالخدمة. حاول مرة أخرى لاحقاً.");
       return;
@@ -532,7 +566,7 @@
     const { data } = await client.auth.getSession();
     if (data.session) {
       try { showApp(data.session); await loadData(); renderView(); }
-      catch (error) { showAuth(); setLoginError(error.message || "تعذر تحميل البيانات."); }
+      catch (error) { showAuth(); setLoginError(friendlyError(error, "تعذر تحميل البيانات.")); }
     }
     client.auth.onAuthStateChange((_event, session) => { if (session) showApp(session); else showAuth(); });
   }
