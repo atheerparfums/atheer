@@ -167,16 +167,16 @@ on conflict (setting_key) do nothing;
 insert into public.site_assets
   (asset_key, storage_path, public_url, alt_text, placement, sort_order)
 values
-  ('hero', 'assets/hero-atheer.webp', null, 'قارورة أثير على طاولة مغربية', 'hero', 1),
-  ('product', 'assets/atheer-cutout.webp', null, 'قارورة عطر أثير', 'product', 2),
+  ('hero', 'assets/webp/hero-atheer.webp', null, 'قارورة أثير على طاولة مغربية', 'hero', 1),
+  ('product', 'assets/webp/atheer-cutout.webp', null, 'قارورة عطر أثير', 'product', 2),
   ('offer', 'assets/special-offer.jpg', null, '3 عطور أثير + هدية مجانية', 'offer', 3),
-  ('gallery-flatlay', 'assets/atheer-flatlay.webp', null, 'قارورة أثير محاطة بالحمضيات', 'gallery', 4),
-  ('gallery-room', 'assets/atheer-moroccan-room.webp', null, 'قارورة أثير في مساحة مغربية', 'gallery', 5),
-  ('gallery-lantern', 'assets/moroccan-lantern.webp', null, 'فانوس مغربي نحاسي', 'gallery', 6),
-  ('gallery-zellige', 'assets/zellige-detail.webp', null, 'زليج مغربي', 'gallery', 7),
-  ('gallery-hero', 'assets/hero-atheer.webp', null, 'قارورة أثير على طاولة مغربية', 'gallery', 8),
-  ('gallery-gift', 'assets/atheer-gift-set.webp', null, 'مجموعة عطر أثير', 'gallery', 9),
-  ('gallery-closeup', 'assets/atheer-closeup.webp', null, 'تفاصيل قارورة أثير', 'gallery', 10)
+  ('gallery-flatlay', 'assets/webp/atheer-flatlay.webp', null, 'قارورة أثير محاطة بالحمضيات', 'gallery', 4),
+  ('gallery-room', 'assets/webp/atheer-moroccan-room.webp', null, 'قارورة أثير في مساحة مغربية', 'gallery', 5),
+  ('gallery-lantern', 'assets/webp/moroccan-lantern.webp', null, 'فانوس مغربي نحاسي', 'gallery', 6),
+  ('gallery-zellige', 'assets/webp/zellige-detail.webp', null, 'زليج مغربي', 'gallery', 7),
+  ('gallery-hero', 'assets/webp/hero-atheer.webp', null, 'قارورة أثير على طاولة مغربية', 'gallery', 8),
+  ('gallery-gift', 'assets/webp/atheer-gift-set.webp', null, 'مجموعة عطر أثير', 'gallery', 9),
+  ('gallery-closeup', 'assets/webp/atheer-closeup.webp', null, 'تفاصيل قارورة أثير', 'gallery', 10)
 on conflict (asset_key) do nothing;
 
 insert into public.products (code, name, gender, image_asset_key, sort_order)

@@ -24,7 +24,11 @@
     if (asset?.public_url) return asset.public_url;
     const path = String(asset?.storage_path || "");
     if (!path) return "";
-    if (/^assets\//i.test(path)) return path;
+    if (/^assets\//i.test(path)) {
+      // Auto-fix legacy seed paths: assets/*.webp → assets/webp/*.webp
+      if (/^assets\/[^/]+\.webp$/i.test(path)) return path.replace("assets/", "assets/webp/");
+      return path;
+    }
     return `${config.supabaseUrl.replace(/\/$/, "")}/storage/v1/object/public/${encodeURIComponent(storageBucket)}/${path.split("/").map(encodeURIComponent).join("/")}`;
   }
   function text(value) { return String(value ?? ""); }
@@ -35,6 +39,7 @@
     });
   }
   function updateAssets(assets) {
+    if (!assets.length) return; // don't hide everything when Supabase returns empty
     Object.values(assetSelectors).flat().forEach(selector => {
       if (selector.endsWith("::before")) {
         document.documentElement.style.setProperty("--atheer-hero-image", "none");
@@ -62,6 +67,7 @@
     });
   }
   function updateContent(items) {
+    if (!items.length) return; // don't hide everything when Supabase returns empty
     Object.values(contentSelectors).forEach(selector => {
       document.querySelectorAll(selector).forEach(element => element.setAttribute("hidden", ""));
     });
@@ -87,6 +93,8 @@
       <span class="p-card-name">${name}</span></div>`;
   }
   function renderProducts(products, assets) {
+    if (!products.length) return; // don't wipe grids when Supabase returns empty
+    window.__atheerSyncDone = true; // signal that real data is loaded
     const assetMap = Object.fromEntries(assets.map(asset => [asset.asset_key, asset]));
     const groups = { femme: document.getElementById("grid-femme"), homme: document.getElementById("grid-homme") };
     Object.entries(groups).forEach(([gender, grid]) => {

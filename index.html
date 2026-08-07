@@ -722,7 +722,7 @@
 
           <!-- View full list -->
           <div class="view-full-list-wrap reveal">
-            <span class="vfl-label">73 عطراً في المجموع · نسائي ورجالي</span>
+            <span class="vfl-label">76 عطراً في المجموع · نسائي ورجالي</span>
             <button class="vfl-btn" id="vfl-btn" type="button">
               شاهد القائمة الكاملة <span class="vfl-arrow">↓</span>
             </button>
@@ -1276,7 +1276,7 @@
         const sk = Array(8).fill('<li class="fl-item fl-skel">&nbsp;</li>').join('');
         document.getElementById("fl-femme").innerHTML = sk;
         document.getElementById("fl-homme").innerHTML = sk;
-        setTimeout(renderFullList, 400);
+        setTimeout(function() { if (!window.__atheerSyncDone) renderFullList(); }, 600);
       })();
 
       /* ════════════════════════════════
