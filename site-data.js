@@ -110,9 +110,26 @@
     if (delivery) document.querySelectorAll(".hero-delivery-badge, .offer-price-unit small").forEach(element => element.textContent = delivery);
     if (price) document.querySelectorAll(".offer-price-num").forEach(element => element.textContent = price);
   }
+  function updateTheme(settings) {
+    const theme = Object.fromEntries(settings.filter(item => item.setting_key.startsWith("theme_")).map(item => [item.setting_key, item.value]));
+    const root = document.documentElement;
+    const variables = {
+      theme_bg: "--ink",
+      theme_surface: "--ink-card",
+      theme_text: "--cream",
+      theme_muted: "--muted",
+      theme_accent: "--gold",
+      theme_accent_light: "--gold-light",
+      theme_jade: "--jade",
+      theme_radius: "--radius"
+    };
+    Object.entries(variables).forEach(([setting, variable]) => {
+      if (theme[setting]) root.style.setProperty(variable, theme[setting]);
+    });
+  }
   async function sync() {
     try {
-      const [assets, content, products, settings] = await Promise.all([
+       const [assets, content, products, settings] = await Promise.all([
         fetchTable("site_assets", "select=asset_key,storage_path,public_url,alt_text,is_hidden&order=sort_order"),
         fetchTable("site_content", "select=content_key,value,is_hidden"),
         fetchTable("products", "select=code,name,gender,image_asset_key,is_featured&is_hidden=eq.false&order=gender,sort_order"),
@@ -120,7 +137,7 @@
       ]);
       const publicSettings = content.filter(item => item.content_key.startsWith("setting_") && !item.is_hidden)
         .map(item => ({ setting_key: item.content_key.replace(/^setting_/, ""), value: item.value }));
-      updateAssets(assets); updateContent(content); updateSettings(settings.length ? settings : publicSettings);
+       updateAssets(assets); updateContent(content); updateTheme(settings.length ? settings : publicSettings); updateSettings(settings.length ? settings : publicSettings);
       renderProducts(products, assets.filter(asset => !asset.is_hidden));
     } catch (_error) {
       // The bundled storefront remains available if the content service is unavailable.
