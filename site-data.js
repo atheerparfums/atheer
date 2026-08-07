@@ -24,7 +24,11 @@
     if (asset?.public_url) return asset.public_url;
     const path = String(asset?.storage_path || "");
     if (!path) return "";
-    if (/^assets\//i.test(path)) return path;
+    if (/^assets\//i.test(path)) {
+      // Auto-fix legacy seed paths: assets/*.webp → assets/webp/*.webp
+      if (/^assets\/[^/]+\.webp$/i.test(path)) return path.replace("assets/", "assets/webp/");
+      return path;
+    }
     return `${config.supabaseUrl.replace(/\/$/, "")}/storage/v1/object/public/${encodeURIComponent(storageBucket)}/${path.split("/").map(encodeURIComponent).join("/")}`;
   }
   function text(value) { return String(value ?? ""); }
