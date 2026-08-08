@@ -56,7 +56,8 @@ html[dir="rtl"] .main-panel { margin-left: 0; margin-right: 245px; }
 .topbar-user { display: flex; align-items: center; gap: 12px; color: var(--muted); font-size: 10px; }
 .user-avatar { display: grid; place-items: center; width: 34px; height: 34px; border: 1px solid var(--gold); color: var(--gold-light); font-family: serif; }
 .mobile-menu { display: none; padding: 8px; border: 1px solid var(--line); background: transparent; color: var(--gold-light); }
-.view { padding-top: 38px; }
+.view { display: none; padding-top: 38px; }
+.view.active-view { display: block; }
 .dashboard-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 14px; margin-bottom: 30px; }
 .stat-card { padding: 22px; border: 1px solid var(--line); background: var(--ink-card); }
 .stat-card small { color: var(--muted); font-size: 10px; }
