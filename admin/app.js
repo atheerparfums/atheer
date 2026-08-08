@@ -158,6 +158,7 @@
     $("#page-title").textContent = ({ overview: "نظرة عامة", products: "المنتجات", media: "الصور والوسائط", content: "المحتوى", settings: "الإعدادات" })[view];
     renderView();
     $(".sidebar")?.classList.remove("open");
+    window.scrollTo({ top: 0, behavior: "instant" });
   }
 
   function renderView() {
