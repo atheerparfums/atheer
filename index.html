@@ -528,8 +528,34 @@
         .fl-cols { grid-template-columns:1fr; gap:20px; }
         .full-list-inner { padding:52px 0 72px; }
         .sel-counter { padding:12px 18px; gap:14px; }
-        .sticky-bar { padding:10px 16px; }
-        .order-now-float { bottom:18px; left:12px; padding:14px 22px; font-size:12px; }
+        /* ── Full-width floating bar on mobile ── */
+        .order-now-float {
+          left:0 !important; right:0 !important; bottom:0 !important;
+          width:100% !important;
+          justify-content:center !important;
+          padding:18px 24px !important;
+          font-size:14px !important;
+          letter-spacing:.1em !important;
+          gap:14px !important;
+          /* override beckon nudge — use glow pulse only on full-width */
+          animation:cta-glow-pulse 2.2s ease-in-out infinite !important;
+          box-shadow:0 -2px 0 rgba(240,218,130,.28), 0 -8px 32px rgba(183,147,83,.35) !important;
+        }
+        /* shimmer works great on wide bar */
+        .order-now-float::before {
+          content:"" !important;
+          position:absolute !important; inset:0 !important;
+          background:linear-gradient(105deg,transparent 20%,rgba(255,255,255,.45) 50%,transparent 80%) !important;
+          border:0 !important; opacity:1 !important;
+          animation:cta-shimmer 3s ease-in-out infinite !important;
+        }
+        .order-now-float::after {
+          display:none !important;
+        }
+        /* dot slightly bigger */
+        .order-now-dot { width:9px !important; height:9px !important; }
+        /* sticky bar sits ABOVE the float bar (≈58px tall) */
+        .sticky-bar { bottom:58px !important; padding:10px 16px; }
         .cta-order { padding:13px 22px !important; font-size:12px !important; }
         .form-row { grid-template-columns:1fr; }
         .order-modal-body { padding:18px 16px; }
@@ -603,6 +629,10 @@
         .price-compare { gap:10px; }
         .pc-item { padding:11px 16px; }
         .wa-float { bottom:72px; right:14px; width:46px; height:46px; font-size:20px; }
+        /* on small screens float bar is full-width at bottom — lift wa button above it */
+        @media (max-width:600px) {
+          .wa-float { bottom:76px !important; }
+        }
         .offer-trust { flex-direction:column; }
         .ot-item { border-left:0; border-bottom:1px solid var(--line); width:100%; justify-content:flex-start; }
         .ot-item:last-child { border-bottom:0; }
