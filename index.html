@@ -283,6 +283,17 @@
       .sticky-proceed:disabled { opacity:.5; cursor:not-allowed; }
 
       /* ════════ FLOATING "اطلب الآن" BUTTON ════════ */
+      /* ── Floating CTA ── */
+      @keyframes atheer-signal {
+        0%   { opacity:.82; transform:scale(1);    }
+        20%  { opacity:.35; transform:scale(1.22); }
+        42%  { opacity:0;   transform:scale(1.62); }
+        100% { opacity:0;   transform:scale(1.62); }
+      }
+      @keyframes atheer-shimmer {
+        0%,100% { background-position:200% center; }
+        50%     { background-position:-200% center; }
+      }
       .order-now-float {
         position:fixed;
         bottom:28px;
@@ -298,11 +309,31 @@
         font-size:11px;
         font-weight:700;
         letter-spacing:.07em;
-        box-shadow:0 8px 28px rgba(183,147,83,.4);
+        box-shadow:0 8px 28px rgba(183,147,83,.38),0 2px 0 rgba(255,240,180,.22) inset;
         transition:transform .25s,background .25s,box-shadow .25s,bottom .35s cubic-bezier(.2,.7,.2,1);
         white-space:nowrap;
+        overflow:visible;
       }
-      .order-now-float:hover { background:var(--gold-light); transform:translateY(-3px); box-shadow:0 14px 40px rgba(183,147,83,.5); }
+      /* Two expanding rings — turn-signal rhythm: flash · flash · pause · repeat */
+      .order-now-float::before,
+      .order-now-float::after {
+        content:"";
+        position:absolute;
+        inset:0;
+        border:1.5px solid var(--gold);
+        opacity:0;
+        pointer-events:none;
+        animation:atheer-signal 2.5s cubic-bezier(.4,0,.55,1) infinite;
+      }
+      .order-now-float::after { animation-delay:.52s; }
+      /* Pause rings on hover — no distraction while user interacts */
+      .order-now-float:hover::before,
+      .order-now-float:hover::after { animation-play-state:paused; opacity:0; }
+      .order-now-float:hover {
+        background:var(--gold-light);
+        transform:translateY(-3px);
+        box-shadow:0 14px 40px rgba(183,147,83,.55);
+      }
       .on-badge { min-width:19px; height:19px; background:#17100a; color:var(--gold-light); border-radius:10px; display:flex; align-items:center; justify-content:center; font-size:10px; font-weight:700; padding:0 5px; }
 
       /* ════════ ORDER MODAL ════════ */
